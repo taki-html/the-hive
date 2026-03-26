@@ -1,0 +1,24 @@
+/* Import the Tailwind v4 Engine */
+@import "tailwindcss";
+
+/* 1. Define Our Hive Variables */
+@theme {
+  --color-hive-black: #111111;
+  --color-hive-brown: #2C241B;
+  --color-hive-yellow: #FFC107;
+  --color-hive-gold: #D4AF37;
+  --color-hive-text: #F0F0F0;
+}
+
+/* 2. Global Resets for the Dark Theme */
+@layer base {
+  body {
+    background-color: var(--color-hive-black);
+    color: var(--color-hive-text);
+  }
+}
+
+/* 3. Our Custom Hexagon Utility */
+@utility clip-hexagon {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
