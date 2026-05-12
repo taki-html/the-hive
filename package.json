@@ -2,7 +2,7 @@
   "name": "taki-html",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://taki-html.github.io/the-hive",
+  "homepage": "https://taki-html.github.io/the-hive/",
   "type": "module",
   "scripts": {
     "dev": "vite",
