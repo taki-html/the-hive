@@ -1,118 +1,94 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Shield, Activity, Cpu, Hexagon as HexIcon } from 'lucide-react';
+import { User, Shield, Bell, Monitor, Save, Camera } from 'lucide-react';
 import Hexagon from '../components/Hexagon';
 
-// 1. The Alternating Grid Blueprint
-// 7-6-7-6-7-6-7 pattern creates perfect nesting.
-// The interactive nodes are positioned to form the diamond.
-const hiveBlueprint = [        // Row 0 (7)
-  ['e', 'e', 'e', 'e', 'e', 'e'],               // Row 1 (6)
-  ['e', 'e', 'e', 'e', 'e', 'e', 'e'],    // Row 2 (7) 
-  ['e', 'e', 'hero', 'e', 'e', 'secure'],    // Row 3 (6) 
-  ['e', 'analyze', 'e', 'e', 'control', 'e', 'e'],       // Row 4 (7) 
-  ['e', 'e', 'e', 'e', 'e', 'e'],               // Row 5 (6)
-  ['e', 'e', 'e', 'e', 'e', 'e', 'e']           // Row 6 (7)
-];
-
-export default function Landing() {
-  const renderHexContent = (type) => {
-    const linkWrapper = "flex flex-col items-center justify-center w-full h-full cursor-pointer select-none";
-    switch (type) {
-      case 'analyze':
-      return (
-        <Link to="/dashboard" className={linkWrapper}>
-          <Activity className="w-10 h-10 mb-3 text-hive-yellow group-hover:text-hive-black transition-colors duration-300" />
-          <h3 className="text-lg font-bold tracking-widest text-hive-yellow group-hover:text-hive-black uppercase">Análise</h3>
-        </Link>
-      );
-      case 'secure':
-      return (
-        <Link to="/settings" className={linkWrapper}>
-          <Shield className="w-10 h-10 mb-3 text-hive-yellow group-hover:text-hive-black transition-colors duration-300" />
-          <h3 className="text-lg font-bold tracking-widest text-hive-yellow group-hover:text-hive-black uppercase">Segurança</h3>
-        </Link>
-      );
-      case 'control':
-      return (
-        <Link to="/control" className={linkWrapper}>
-          <Cpu className="w-10 h-10 mb-3 text-hive-yellow group-hover:text-hive-black transition-colors duration-300" />
-          <h3 className="text-lg font-bold tracking-widest text-hive-yellow group-hover:text-hive-black uppercase">Controles</h3>
-        </Link>
-      );
-      case 'hero':
-        return (
-          <Link to="/guide" className={linkWrapper}>
-            <HexIcon className="w-8 h-8 mb-2 text-hive-yellow group-hover:text-hive-black transition-colors duration-300" />
-            <h1 className="text-xl md:text-2xl font-black mb-4 tracking-wider text-hive-yellow group-hover:text-hive-black uppercase">A Colmeia</h1>
-          </Link>
-        );
-      default:
-        return null; // Empty nodes just show the geometric pattern
-    }
-  };
-
-  const getHexStyles = (type) => {
-    // Sizing: w-48/h-[210px] is roughly a perfect hexagon ratio. 
-    // Adjust these if your clip-path utility relies on a different aspect ratio.
-    const baseSize = "w-40 h-[175px] md:w-56 md:h-[245px]"; 
-    
-    if (type === 'e') {
-      return {
-        className: `${baseSize} pointer-events-none opacity-40`,
-        borderClassName: "bg-hive-yellow/10", // Dim yellow wireframe
-        innerClassName: "bg-[#0a0a0a]" // Very dark, matches background
-      };
-    }
-    
-    // Interactive Nodes
-    return {
-      className: `${baseSize} z-20 cursor-pointer transition-transform duration-500 hover:scale-105 hover:z-50`,
-      // Bright yellow border that glows on hover
-      borderClassName: "bg-hive-yellow group-hover:bg-hive-gold group-hover:shadow-[0_0_30px_rgba(255,193,7,0.6)]",
-      // Black interior that fills with yellow on hover
-      innerClassName: "bg-hive-black group-hover:bg-hive-yellow transition-colors duration-300"
-    };
-  };
-
+export default function Settings() {
   return (
-    // 1. fixed inset-0: Locks the container to the exact viewport boundaries.
-    // 2. overflow-hidden: Clips anything bleeding off the edge.
-    // 3. overscroll-none touch-none: Prevents mobile pull-to-refresh and elastic bounce.
-    // 4. h-[100dvh]: Uses dynamic viewport height so mobile browser UI bars don't cause overflow.
-    <main className="fixed inset-0 w-screen h-[100dvh] flex items-center justify-center bg-[#0a0a0a] overflow-hidden overscroll-none touch-none">
+    <div className="max-w-5xl mx-auto p-8 grid grid-cols-1 md:grid-cols-[250px_1fr] gap-8">
       
-      {/* The grid container. 
-        Note: If you want the entire diamond to shrink and fit fully on smaller screens 
-        instead of bleeding off, you can add responsive scaling here like `scale-75 md:scale-100`.
-      */}
-      <div className="relative flex flex-col items-center justify-center w-max">
-        
-        {hiveBlueprint.map((row, rowIndex) => (
-          <div 
-            key={`row-${rowIndex}`} 
-            // The negative margin math depends on your height. 
-            // 25% of 245px = 61px. 25% of 175px = 43px.
-            className={`flex justify-center -space-x-1 md:-space-x-2 ${rowIndex > 0 ? '-mt-[43px] md:-mt-[61px]' : ''}`}
-          >
-            {row.map((cellType, cellIndex) => {
-              const styles = getHexStyles(cellType);
-              
-              return (
-                <Hexagon 
-                  key={`cell-${rowIndex}-${cellIndex}`}
-                  className={styles.className}
-                  borderClassName={styles.borderClassName}
-                  innerClassName={styles.innerClassName}
-                >
-                  {renderHexContent(cellType)}
-                </Hexagon>
-              );
-            })}
-          </div>
-        ))}
+      {/* Sidebar Menu */}
+      <aside className="flex flex-col gap-2">
+        <button className="flex items-center gap-3 w-full text-left p-4 bg-hive-brown border-l-4 border-hive-yellow text-hive-text font-medium transition-colors">
+          <User size={18} className="text-hive-yellow" /> Perfil da Conta
+        </button>
+        <button className="flex items-center gap-3 w-full text-left p-4 border-l-4 border-transparent hover:bg-hive-brown hover:border-hive-yellow transition-colors">
+          <Shield size={18} /> Segurança e Acesso
+        </button>
+        <button className="flex items-center gap-3 w-full text-left p-4 border-l-4 border-transparent hover:bg-hive-brown hover:border-hive-yellow transition-colors">
+          <Bell size={18} /> Notificações
+        </button>
+        <button className="flex items-center gap-3 w-full text-left p-4 border-l-4 border-transparent hover:bg-hive-brown hover:border-hive-yellow transition-colors">
+          <Monitor size={18} /> Preferências do Sistema
+        </button>
+      </aside>
 
-      </div>
-    </main>
+      {/* Main Settings Area */}
+      <main className="bg-hive-brown border border-hive-gold/30 p-8 shadow-xl">
+        
+        {/* Avatar Section */}
+        <div className="flex items-center gap-6 mb-10">
+          <Hexagon className="w-28 h-32 bg-hive-gold p-0 flex justify-center items-center hover:-translate-y-0 hover:bg-hive-gold">
+            <div className="w-[104px] h-[120px] bg-[#1a150f] clip-hexagon flex justify-center items-center">
+               <User size={40} className="text-hive-gold" />
+            </div>
+          </Hexagon>
+          <div>
+            <h2 className="text-2xl font-bold text-hive-yellow mb-1">Operador Prime</h2>
+            <p className="text-hive-gold text-sm mb-3">Nível 4 de Acesso</p>
+            <button className="flex items-center gap-2 bg-hive-black text-hive-text border border-hive-gold px-4 py-2 text-sm uppercase font-bold hover:bg-hive-gold hover:text-hive-black transition-colors">
+              <Camera size={14} /> Mudar Avatar
+            </button>
+          </div>
+        </div>
+
+        <hr className="border-t border-hive-gold/20 mb-8" />
+
+        {/* Form Inputs */}
+        <form>
+          <div className="flex flex-col mb-6">
+            <label htmlFor="username" className="text-hive-gold text-xs uppercase tracking-widest mb-2 font-bold">Username</label>
+            <input 
+              type="text" 
+              id="username" 
+              defaultValue="Operator Prime" 
+              className="bg-hive-black/50 border-b border-hive-gold text-hive-text px-4 py-3 focus:outline-none focus:border-b-2 focus:border-hive-yellow focus:bg-[#362d22] transition-all"
+            />
+          </div>
+
+          <div className="flex flex-col mb-10">
+            <label htmlFor="email" className="text-hive-gold text-xs uppercase tracking-widest mb-2 font-bold">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              defaultValue="prime@thehive.network" 
+              className="bg-hive-black/50 border-b border-hive-gold text-hive-text px-4 py-3 focus:outline-none focus:border-b-2 focus:border-hive-yellow focus:bg-[#362d22] transition-all"
+            />
+          </div>
+
+          <h3 className="text-xl font-bold text-hive-gold mb-6">Protocolos de Segurança</h3>
+
+          {/* Custom Toggle Switch 1 */}
+          <div className="flex justify-between items-center bg-hive-black/30 border border-hive-gold/20 p-4 mb-4">
+            <div>
+              <div className="font-bold text-hive-text">Autenticação de Dois Fatores</div>
+            </div>
+            <label className="relative inline-block w-12 h-6 cursor-pointer">
+              <input type="checkbox" className="sr-only peer" defaultChecked />
+              {/* The Track */}
+              <div className="w-full h-full bg-hive-black border border-hive-gold peer-checked:border-hive-yellow transition-colors duration-300"></div>
+              {/* The Hexagon Thumb */}
+              <div className="absolute left-[2px] top-[2px] w-5 h-5 bg-hive-text clip-hexagon transition-transform duration-300 peer-checked:translate-x-[24px] peer-checked:bg-hive-yellow"></div>
+            </label>
+          </div>
+
+          <div className="text-right mt-8">
+            <button type="button" className="inline-flex items-center gap-2 bg-hive-black text-hive-yellow border border-hive-yellow px-6 py-3 font-bold uppercase tracking-wide transition-colors hover:bg-hive-yellow hover:text-hive-black">
+              <Save size={18} /> Salvar Configurações
+            </button>
+          </div>
+        </form>
+
+      </main>
+    </div>
   );
 }
