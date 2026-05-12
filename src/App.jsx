@@ -1,8 +1,8 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// Changed from BrowserRouter to HashRouter
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 
-// We will create these next
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
@@ -17,7 +17,7 @@ export default function App() {
         <Navbar />
         
         {/* The page content changes here */}
-        <main className="flex-grow">
+        <main className="grow">
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/dashboard" element={<Dashboard />} />
