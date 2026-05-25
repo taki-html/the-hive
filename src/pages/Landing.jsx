@@ -3,17 +3,18 @@ import { Link } from 'react-router-dom';
 import { Shield, Activity, Cpu, Hexagon as HexIcon } from 'lucide-react';
 import Hexagon from '../components/Hexagon';
 
-// 1. The Alternating Grid Blueprint
-// 7-6-7-6-7-6-7 pattern creates perfect nesting.
-// The interactive nodes are positioned to form the diamond.
-const hiveBlueprint = [        // Row 0 (7)
-  ['e', 'e', 'e', 'e', 'e', 'e'],               // Row 1 (6)
-  ['e', 'e', 'e', 'e', 'e', 'e', 'e'],    // Row 2 (7) 
-  ['e', 'e', 'hero', 'e', 'e', 'secure'],    // Row 3 (6) 
-  ['e', 'analyze', 'e', 'e', 'control', 'e', 'e'],       // Row 4 (7) 
-  ['e', 'e', 'e', 'e', 'e', 'e'],               // Row 5 (6)
-  ['e', 'e', 'e', 'e', 'e', 'e', 'e']           // Row 6 (7)
+// 1. Grid Desktop
+const hiveBlueprint = [        
+  ['e', 'e', 'e', 'e', 'e', 'e'],               
+  ['e', 'e', 'e', 'e', 'e', 'e', 'e'],    
+  ['e', 'e', 'hero', 'e', 'e', 'secure'],    
+  ['e', 'analyze', 'e', 'e', 'control', 'e', 'e'],       
+  ['e', 'e', 'e', 'e', 'e', 'e'],               
+  ['e', 'e', 'e', 'e', 'e', 'e', 'e']           
 ];
+
+// 2. Lista simples para o Mobile
+const mobileNodes = ['hero', 'analyze', 'control', 'secure'];
 
 export default function Landing() {
   const renderHexContent = (type) => {
@@ -48,56 +49,58 @@ export default function Landing() {
           </Link>
         );
       default:
-        return null; // Empty nodes just show the geometric pattern
+        return null; 
     }
   };
 
   const getHexStyles = (type) => {
-    // Sizing: w-48/h-[210px] is roughly a perfect hexagon ratio. 
-    // Adjust these if your clip-path utility relies on a different aspect ratio.
     const baseSize = "w-40 h-[175px] md:w-56 md:h-[245px]"; 
     
     if (type === 'e') {
       return {
         className: `${baseSize} pointer-events-none opacity-40`,
-        borderClassName: "bg-hive-yellow/10", // Dim yellow wireframe
-        innerClassName: "bg-[#0a0a0a]" // Very dark, matches background
+        borderClassName: "bg-hive-yellow/10",
+        innerClassName: "bg-[#0a0a0a]"
       };
     }
     
-    // Interactive Nodes
     return {
       className: `${baseSize} z-20 cursor-pointer transition-transform duration-500 hover:scale-105 hover:z-50`,
-      // Bright yellow border that glows on hover
       borderClassName: "bg-hive-yellow group-hover:bg-hive-gold group-hover:shadow-[0_0_30px_rgba(255,193,7,0.6)]",
-      // Black interior that fills with yellow on hover
       innerClassName: "bg-hive-black group-hover:bg-hive-yellow transition-colors duration-300"
     };
   };
 
   return (
-    // 1. fixed inset-0: Locks the container to the exact viewport boundaries.
-    // 2. overflow-hidden: Clips anything bleeding off the edge.
-    // 3. overscroll-none touch-none: Prevents mobile pull-to-refresh and elastic bounce.
-    // 4. h-[100dvh]: Uses dynamic viewport height so mobile browser UI bars don't cause overflow.
-    <main className="fixed inset-0 w-screen h-[100dvh] flex items-center justify-center bg-[#0a0a0a] overflow-hidden overscroll-none touch-none">
+
+    <main className="h-[calc(100dvh-80px)] w-full flex items-center justify-center bg-[#0a0a0a] overflow-hidden overscroll-none touch-none">
       
-      {/* The grid container. 
-        Note: If you want the entire diamond to shrink and fit fully on smaller screens 
-        instead of bleeding off, you can add responsive scaling here like `scale-75 md:scale-100`.
-      */}
-      <div className="relative flex flex-col items-center justify-center w-max">
-        
+    {/* --- LAYOUT MOBILE --- */}
+    <div className="grid md:hidden grid-cols-2 gap-3 sm:gap-4 place-items-center max-w-[360px] mx-auto -mt-40">
+      {mobileNodes.map((cellType, index) => {
+        const styles = getHexStyles(cellType);
+        return (
+          <Hexagon 
+            key={`mobile-${index}`}
+            className={styles.className}
+            borderClassName={styles.borderClassName}
+            innerClassName={styles.innerClassName}
+          >
+            {renderHexContent(cellType)}
+          </Hexagon>
+        );
+      })}
+    </div>
+
+      {/* --- LAYOUT DESKTOP --- */}
+      <div className="hidden md:flex relative flex-col items-center justify-center w-max origin-center md:scale-[0.70] lg:scale-90 xl:scale-100 transition-transform duration-500">
         {hiveBlueprint.map((row, rowIndex) => (
           <div 
             key={`row-${rowIndex}`} 
-            // The negative margin math depends on your height. 
-            // 25% of 245px = 61px. 25% of 175px = 43px.
-            className={`flex justify-center -space-x-1 md:-space-x-2 ${rowIndex > 0 ? '-mt-[43px] md:-mt-[61px]' : ''}`}
+            className={`flex justify-center -space-x-2 ${rowIndex > 0 ? '-mt-[61px]' : ''}`}
           >
             {row.map((cellType, cellIndex) => {
               const styles = getHexStyles(cellType);
-              
               return (
                 <Hexagon 
                   key={`cell-${rowIndex}-${cellIndex}`}
@@ -111,8 +114,8 @@ export default function Landing() {
             })}
           </div>
         ))}
-
       </div>
+
     </main>
   );
 }
