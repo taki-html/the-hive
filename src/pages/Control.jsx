@@ -1,100 +1,145 @@
-import React from 'react';
-import { Power, Zap, ShieldAlert, Thermometer, Droplets, Wind } from 'lucide-react';
-import { Radar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  RadialLinearScale,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import Hexagon from '../components/Hexagon';
-
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
-
-const CONTROL_ACTIONS = [
-  { id: 'pwr', label: 'Core Power', icon: Zap, color: 'border-yellow-500', active: true },
-  { id: 'cool', label: 'Cooling', icon: Thermometer, color: 'border-blue-500', active: true },
-  { id: 'vent', label: 'Ventilation', icon: Wind, color: 'border-green-500', active: false },
-  { id: 'sec', label: 'Security', icon: ShieldAlert, color: 'border-red-500', active: true },
-];
+import React, { useState } from 'react';
+import { Send, Cpu, Hash, AlertCircle, CheckCircle2, ShieldAlert } from 'lucide-react';
+import Hexagon from '../components/Hexagon'; // Assuming you kept your Hexagon wrapper
 
 export default function Control() {
-  const radarData = {
-    labels: ['Energy', 'CPU', 'Thermal', 'Network', 'Stability', 'Load'],
-    datasets: [{
-      label: 'System Output',
-      data: [80, 90, 60, 70, 95, 50],
-      backgroundColor: 'rgba(255, 193, 7, 0.2)',
-      borderColor: '#ffc107',
-      borderWidth: 2,
-      pointBackgroundColor: '#ffc107',
-    }]
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ type: '', message: '' });
+  
+  // State mapping directly to the new SQL 'comandos_hardware' table
+  const [commandData, setCommandData] = useState({
+    device_token: 'TX_001', // Default token based on the PHP fallback
+    tipo: 'MUDAR_ID', 
+    novo_id_maquina: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCommandData(prev => ({ ...prev, [name]: value }));
   };
 
-  const radarOptions = {
-    scales: {
-      r: {
-        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-        pointLabels: { color: '#e0e0e0', font: { size: 12 } },
-        ticks: { display: false }
-      }
-    },
-    plugins: { legend: { display: false } }
+  const sendCommand = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      // NOTE: Karol will need to create this endpoint to receive the frontend POST request
+      const response = await fetch('https://api-maquinas-1.onrender.com/hardware/enviar_comando.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          device_token: commandData.device_token,
+          tipo: commandData.tipo,
+          novo_id_maquina: commandData.tipo === 'MUDAR_ID' ? parseInt(commandData.novo_id_maquina) : null
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.message || "Falha ao enviar comando");
+
+      setStatus({ type: 'success', message: 'Comando adicionado à fila com sucesso! (Status: PENDENTE)' });
+      setCommandData(prev => ({ ...prev, novo_id_maquina: '' })); // Reset ID field
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-hive-black text-hive-text p-8 pt-24">
-      <header className="mb-12 border-l-4 border-hive-yellow pl-6">
-        <h1 className="text-4xl font-black uppercase tracking-tighter">System Control</h1>
-        <p className="text-hive-yellow opacity-60 tracking-[0.3em] text-xs">Manual Override & Resource Allocation</p>
+    <div className="flex flex-col gap-6 p-6 max-w-4xl mx-auto">
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold text-hive-text flex items-center gap-3">
+          <ShieldAlert className="text-hive-yellow" size={32} />
+          Terminal de Controle
+        </h1>
+        <p className="text-gray-400 mt-2">Envio de instruções assíncronas para o hardware via MQTT/HTTP.</p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        
-        {/* Left: Tactical Hex Grid */}
-        <div className="flex flex-wrap justify-center gap-4">
-          {CONTROL_ACTIONS.map((action) => (
-            <div key={action.id} className="cursor-pointer">
-              <Hexagon 
-                className="w-40 h-[175px]" 
-                borderClassName={action.active ? "bg-hive-yellow shadow-[0_0_15px_rgba(255,193,7,0.4)]" : "bg-hive-brown opacity-50"}
-                innerClassName="bg-[#151515] hover:bg-hive-yellow group"
-              >
-                <action.icon className={`w-8 h-8 mb-2 ${action.active ? 'text-hive-yellow' : 'text-hive-brown'} group-hover:text-hive-black transition-colors`} />
-                <span className="text-[10px] font-bold uppercase tracking-widest group-hover:text-hive-black">
-                  {action.label}
-                </span>
-                <div className={`mt-2 h-1 w-8 ${action.active ? 'bg-hive-yellow' : 'bg-transparent'} group-hover:bg-hive-black`} />
-              </Hexagon>
-            </div>
-          ))}
-        </div>
+      <div className="bg-hive-brown border border-hive-gold/20 rounded-xl p-6 shadow-lg">
+        <form onSubmit={sendCommand} className="flex flex-col gap-5">
+          
+          {/* Device Token Input */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-hive-gold flex items-center gap-2">
+              <Cpu size={16} /> Token do Dispositivo (Receptor)
+            </label>
+            <input 
+              type="text" 
+              name="device_token"
+              value={commandData.device_token}
+              onChange={handleInputChange}
+              required
+              className="bg-hive-black border border-gray-700 rounded p-3 text-hive-text focus:border-hive-yellow focus:outline-none"
+              placeholder="Ex: TX_001"
+            />
+          </div>
 
-        {/* Right: Resource Radar */}
-        <div className="bg-[#121212] p-8 border border-hive-brown rounded-sm relative overflow-hidden">
-            {/* Industrial corner accents */}
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-hive-yellow" />
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-hive-yellow" />
-            
-            <h2 className="text-center text-sm font-bold uppercase tracking-[0.4em] mb-8">Resource Distribution</h2>
-            <div className="h-[400px] flex items-center justify-center">
-              <Radar data={radarData} options={radarOptions} />
-            </div>
-        </div>
+          {/* Tipo de Comando Dropdown */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-hive-gold flex items-center gap-2">
+              <Send size={16} /> Tipo de Comando
+            </label>
+            <select 
+              name="tipo"
+              value={commandData.tipo}
+              onChange={handleInputChange}
+              className="bg-hive-black border border-gray-700 rounded p-3 text-hive-text focus:border-hive-yellow focus:outline-none"
+            >
+              <option value="MUDAR_ID">Trocar ID da Máquina (MUDAR_ID)</option>
+              <option value="REINICIAR">Reiniciar Sensor (REINICIAR)</option>
+              <option value="CALIBRAR">Calibrar Microfone (CALIBRAR)</option>
+            </select>
+          </div>
 
+          {/* Novo ID da Máquina (Condicional) */}
+          {commandData.tipo === 'MUDAR_ID' && (
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-hive-gold flex items-center gap-2">
+                <Hash size={16} /> Novo ID da Máquina
+              </label>
+              <input 
+                type="number" 
+                name="novo_id_maquina"
+                value={commandData.novo_id_maquina}
+                onChange={handleInputChange}
+                required
+                min="1"
+                className="bg-hive-black border border-gray-700 rounded p-3 text-hive-text focus:border-hive-yellow focus:outline-none"
+                placeholder="Digite o novo ID numérico"
+              />
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button 
+            type="submit" 
+            disabled={loading}
+            className={`mt-4 flex items-center justify-center gap-2 font-bold py-3 px-6 rounded transition-all ${
+              loading 
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed' 
+                : 'bg-hive-yellow text-hive-black hover:bg-yellow-400 hover:shadow-[0_0_15px_rgba(255,193,7,0.4)]'
+            }`}
+          >
+            {loading ? 'Processando na Hive...' : 'Gravar Comando na Fila'}
+            {!loading && <Send size={18} />}
+          </button>
+        </form>
+
+        {/* Status Messages */}
+        {status.message && (
+          <div className={`mt-6 p-4 rounded flex items-start gap-3 border ${
+            status.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-400' : 'bg-red-500/10 border-red-500/30 text-red-400'
+          }`}>
+            {status.type === 'success' ? <CheckCircle2 size={20} className="shrink-0 mt-0.5" /> : <AlertCircle size={20} className="shrink-0 mt-0.5" />}
+            <p>{status.message}</p>
+          </div>
+        )}
       </div>
-
-      {/* Footer Emergency Kill Switch */}
-      <footer className="mt-16 flex justify-end">
-        <button className="flex items-center gap-4 bg-red-900/20 border border-red-600 text-red-500 px-8 py-4 font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all duration-300">
-          <Power className="w-5 h-5" />
-          Emergency Scram
-        </button>
-      </footer>
     </div>
   );
 }
