@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Activity, Cpu, Hexagon as HexIcon } from 'lucide-react';
+import { Settings, Activity, Cpu, Hexagon as HexIcon } from 'lucide-react';
 import Hexagon from '../components/Hexagon';
 
 // 1. Grid Desktop
@@ -30,15 +30,15 @@ export default function Landing() {
       case 'secure':
       return (
         <Link to="/settings" className={linkWrapper}>
-          <Shield className="w-10 h-10 mb-3 text-hive-yellow group-hover:text-hive-black transition-colors duration-300" />
-          <h3 className="text-lg font-bold tracking-widest text-hive-yellow group-hover:text-hive-black uppercase">Segurança</h3>
+          <Settings className="w-10 h-10 mb-3 text-hive-yellow group-hover:text-hive-black transition-colors duration-300" />
+          <h3 className="text-lg font-bold tracking-widest text-hive-yellow group-hover:text-hive-black uppercase">Configurações</h3>
         </Link>
       );
       case 'control':
       return (
         <Link to="/control" className={linkWrapper}>
           <Cpu className="w-10 h-10 mb-3 text-hive-yellow group-hover:text-hive-black transition-colors duration-300" />
-          <h3 className="text-lg font-bold tracking-widest text-hive-yellow group-hover:text-hive-black uppercase">Controles</h3>
+          <h3 className="text-lg font-bold tracking-widest text-hive-yellow group-hover:text-hive-black uppercase">Controle</h3>
         </Link>
       );
       case 'hero':

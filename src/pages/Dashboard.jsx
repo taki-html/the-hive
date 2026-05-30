@@ -226,7 +226,7 @@ export default function Dashboard() {
         />
         <MetricCard 
           title="Média Sonora" 
-          value={`${estadoMaquina.media_db} dB`} 
+          value={`${parseFloat(estadoMaquina.media_db).toFixed(2)} dB`} 
           icon={Activity} 
           subtitle="Média histórica acumulada" 
         />
