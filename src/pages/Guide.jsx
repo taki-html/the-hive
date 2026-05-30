@@ -2,6 +2,16 @@ import React from 'react';
 import { Book, ShieldAlert, Activity, Cpu } from 'lucide-react';
 
 export default function Guide() {
+  
+  // Custom function to handle smooth scrolling without breaking HashRouter
+  const scrollToSection = (e, sectionId) => {
+    e.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-8 grid grid-cols-1 md:grid-cols-[250px_1fr] gap-12 items-start">
       
@@ -11,9 +21,24 @@ export default function Guide() {
           <Book size={20} /> Documentação
         </h3>
         <nav className="flex flex-col gap-1">
-          <a href="#introduction" className="block text-hive-text py-2 border-b border-white/5 transition-all hover:text-hive-yellow hover:pl-2">Introdução</a>
-          <a href="#the-triad" className="block text-hive-text py-2 border-b border-white/5 transition-all hover:text-hive-yellow hover:pl-2">O Sistema de Tríade</a>
-          <a href="#protocols" className="block text-hive-text py-2 border-b border-white/5 transition-all hover:text-hive-yellow hover:pl-2">Protocolos Principais</a>
+          <button 
+            onClick={(e) => scrollToSection(e, 'introduction')} 
+            className="block w-full text-left text-hive-text py-2 border-b border-white/5 transition-all hover:text-hive-yellow hover:pl-2"
+          >
+            Introdução
+          </button>
+          <button 
+            onClick={(e) => scrollToSection(e, 'the-triad')} 
+            className="block w-full text-left text-hive-text py-2 border-b border-white/5 transition-all hover:text-hive-yellow hover:pl-2"
+          >
+            O Sistema de Tríade
+          </button>
+          <button 
+            onClick={(e) => scrollToSection(e, 'protocols')} 
+            className="block w-full text-left text-hive-text py-2 border-b border-white/5 transition-all hover:text-hive-yellow hover:pl-2"
+          >
+            Protocolos Principais
+          </button>
         </nav>
       </aside>
 
